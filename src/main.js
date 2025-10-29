@@ -136,6 +136,24 @@ answerButton.onClick = async () => {
   const offerDescription = callData.offer;
   await pc.setRemoteDescription(new RTCSessionDescription(offerDescription));
 
+  const answerDescription = await pc.createAnswer();
+  await  pc.setLocalDescription(answerDescription);
 
-  asdfghjkl
-}
+  const answer = {
+    type: answerDescription.type,
+    sdp: answerDescription.sdp,
+  };
+
+  await callDoc.update(( answer ));
+
+  offerCandidates.onSnapshot((snapshot) => {
+    snapshot.dotChange().forEach((change) => {
+      console.log(change)
+      if (change.type === 'added') {
+        let data = change.doc.data();
+        pc.addIceCandidate(new RTCIceCandidate(data));
+      }
+    });
+  }); 
+  
+};
